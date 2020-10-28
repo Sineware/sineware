@@ -15,7 +15,7 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 set -e # Crash when a command fails
-echo "* Starting Sineware ALPHA build on $(date) *"
+echo "* Starting $SINEWARE_PRETTY_NAME build on $(date) *"
 echo "Go get your noodles, this may take a while!"
 
 source /build-scripts/build-configuration.sh
@@ -70,9 +70,10 @@ if [ "$COMPILE_KERNEL" = true ]
 then
   pushd . # Running pushd saves the current directory then popd brings us back there.
   cd $KERNEL_NAME
-  make x86_64_defconfig # todo make a kernel .config
+  echo "Build for ${SINEWARE_ARCH}_defconfig"
+  make ${SINEWARE_ARCH}_defconfig # todo make a kernel .config
   make -j$(nproc)
-  cp arch/x86_64/boot/bzImage $ROOTFS/boot/bzImage
+  cp arch/${SINEWARE_ARCH}/boot/bzImage $ROOTFS/boot/bzImage
   make modules_install INSTALL_MOD_PATH=$ROOTFS
   popd
 else
@@ -95,6 +96,13 @@ for util in $($ROOTFS/System/busybox --list-full); do
 done
 popd
 
+echo "* Build Step: Adding files to rootfs *"
+cp /build-scripts/files/init-files/init $ROOTFS/init
+cp -r /build-scripts/files/etc/* $ROOTFS/etc/
+cp -r /build-scripts/files/usr/* $ROOTFS/usr/
+# Sineware System Files
+cp -r /build-scripts/files/System/deno $ROOTFS/System/
+
 echo "* Building Additional System Components *"
 /build-scripts/components/bash/build.sh
 /build-scripts/components/neofetch/build.sh
@@ -105,13 +113,9 @@ echo "* Building Additional System Components *"
 
 /build-scripts/files/System/CoreServices/build.sh
 
-echo "* Build Step: Adding files to rootfs *"
-cp /build-scripts/files/init-files/init $ROOTFS/init
-cp -r /build-scripts/files/etc/* $ROOTFS/etc/
-cp -r /build-scripts/files/usr/* $ROOTFS/usr/
-# Sineware System Files
-cp -r /build-scripts/files/System/deno $ROOTFS/System/
+/build-scripts/components/insert-name/build.sh
 
+echo "* Build Step: Finishing touches... *"
 # usr merge (todo bad idea?)
 mv $ROOTFS/bin/* $ROOTFS/usr/bin/
 rm -rf $ROOTFS/bin
@@ -120,10 +124,11 @@ rm -rf $ROOTFS/sbin
 
 echo "* Build Step: Cleaning up *"
 #rm -rf $ROOTFS/var
+# todo remove unnecessary files
 
 echo "* Build Step: Creating rootfs archive *"
 cd $ROOTFS
-echo "This Sineware $SINEWARE_VERSION_NAME build was compiled on $(date)" > System/sineware-release
+echo "This ${SINEWARE_PRETTY_NAME} build was compiled on $(date)" > System/sineware-release
 tar -czvf /build-scripts/output/sineware.tar.gz .
 
 echo "* Done! *"

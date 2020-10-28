@@ -11,8 +11,17 @@ export SINEWARE_REPO_HTOP=https://github.com/Sineware/htop.git
 export SINEWARE_REPO_OPENSSH=https://github.com/Sineware/openssh.git
 
 # Build Options
-export COMPILE_KERNEL=false # if false, a bzImage should be in build-scripts/files (NOTE no kernel modules are copied)
-export SINEWARE_VERSION_NAME=DEVELOPMENT
+export COMPILE_KERNEL=true # if false, a bzImage should be in build-scripts/files (NOTE no kernel modules are copied)
+export SINEWARE_ARCH=x86_64
+
+# Names
+export SINEWARE_NAME="Sineware"
+export SINEWARE_VERSION="Development Milestone 1"
+export SINEWARE_ID="sineware"
+export SINEWARE_VERSION_ID="dev-m1"
+
+export SINEWARE_PRETTY_NAME="$SINEWARE_NAME $SINEWARE_VERSION ($SINEWARE_VERSION_ID)"
+
 
 # Paths (do not modify?)
 export ROOTFS=/build/rootfs

@@ -11,6 +11,8 @@ This is the main repository of Sineware, the perfect host for containers and VMs
 The `build-everything.sh` file will create a fresh rootfs tar.gz file (in ./build-scripts/output).
 You need Docker on your system to run it! (Build testing will come eventually)
 
+Both Linux and macOS (Docker Desktop) are officially supported as build hosts.
+
 **You may find it useful to inspect the `build-configuration.sh` file in the build-scripts folder.**
 
 `build-iso.sh` will create a simple read-only ISO (in ./iso-build-scripts/output) with GRUB. It will 
@@ -36,7 +38,7 @@ qemu-system-x86_64 \
 -hda sineware.qcow2
 ```
 
-On Linux you can add the "-enable-kvm" option, and on macOS the "-accel hvf" option (though this appears to be broken currently).
+On Linux you can add the "-enable-kvm" option, and on macOS the "-accel hvf" option to speed up the VM with hardware acceleration.
 
 On first boot, you'll want to run "mkfs.ext2 /dev/sda" to create a simple filesystem on the virtual disk. When you reboot, it will be mounted on /Data.
 
