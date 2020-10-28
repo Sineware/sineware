@@ -1,0 +1,3 @@
+export DENO_DIR=/tmp
+export PATH=/System:$PATH
+export PS1="\[\033[38;5;206m\]\u\[$(tput sgr0)\]@\[$(tput sgr0)\]\[\033[38;5;225m\]\h\[$(tput sgr0)\] \[$(tput sgr0)\]\[\033[38;5;222m\]\w\[$(tput sgr0)\]>\[$(tput sgr0)\] "

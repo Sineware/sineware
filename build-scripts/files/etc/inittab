@@ -1,0 +1,10 @@
+tty1::respawn:/System/CoreServices/CoreServices
+
+tty2::respawn:/usr/sbin/getty -l /usr/bin/login 38400 tty2
+tty3::respawn:/usr/sbin/getty -l /usr/bin/login 38400 tty3
+tty4::respawn:/usr/sbin/getty -l /usr/bin/login 38400 tty4
+tty5::respawn:/usr/sbin/getty -l /usr/bin/login 38400 tty5
+tty6::respawn:/usr/sbin/getty -l /usr/bin/login 38400 tty6
+
+::shutdown:/etc/rc.d/shutdown
+::ctrlaltdel:/usr/sbin/reboot

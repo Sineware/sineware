@@ -1,0 +1,5 @@
+build-scripts/output/sineware.tar.gz
+iso-build-scripts/output/sineware.iso
+sineware.qcow2
+.DS_Store
+.idea
