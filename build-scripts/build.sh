@@ -71,7 +71,8 @@ then
   pushd . # Running pushd saves the current directory then popd brings us back there.
   cd $KERNEL_NAME
   echo "Build for ${SINEWARE_ARCH}_defconfig"
-  make ${SINEWARE_ARCH}_defconfig # todo make a kernel .config
+  #make ${SINEWARE_ARCH}_defconfig # todo make a kernel .config
+  make allyesconfig # full steam ahead yo
   make -j$(nproc)
   cp arch/${SINEWARE_ARCH}/boot/bzImage $ROOTFS/boot/bzImage
   make modules_install INSTALL_MOD_PATH=$ROOTFS
