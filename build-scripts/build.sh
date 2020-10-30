@@ -43,6 +43,7 @@ mkdir -pv $ROOTFS/dev
 mkdir -pv $ROOTFS/etc
 mkdir -pv $ROOTFS/tmp
 mkdir -pv $ROOTFS/boot
+mkdir -pv $ROOTFS/lib
 
 # These are temporary and will be removed at the end of the build process.
 #mkdir -pv $ROOTFS/lib
@@ -70,16 +71,18 @@ if [ "$COMPILE_KERNEL" = true ]
 then
   pushd . # Running pushd saves the current directory then popd brings us back there.
   cd $KERNEL_NAME
-  echo "Build for ${SINEWARE_ARCH}_defconfig"
-  #make ${SINEWARE_ARCH}_defconfig # todo make a kernel .config
-  make allmodconfig # full steam ahead yo
+  echo "Build for ${SINEWARE_ARCH}"
+  #make ${SINEWARE_ARCH}_defconfig
+  #make menuconfig
+  # todo check arch and use that kernel config
+  cp -v /build-scripts/files/kernel/${SINEWARE_ARCH}/.config .
   make -j$(nproc)
-  cp arch/${SINEWARE_ARCH}/boot/bzImage $ROOTFS/boot/bzImage
+  cp -v arch/${SINEWARE_ARCH}/boot/bzImage $ROOTFS/boot/bzImage
   make modules_install INSTALL_MOD_PATH=$ROOTFS
   popd
 else
   echo "Development Build Only: Using prebuilt kernel image..."
-  cp /build-scripts/files/bzImage $ROOTFS/boot/bzImage
+  cp -v /build-scripts/files/kernel/${SINEWARE_ARCH}/bzImage $ROOTFS/boot/bzImage
 fi
 
 echo "* Build Step: BusyBox *"
@@ -87,7 +90,7 @@ pushd .
 cd busybox
 make defconfig
 make -j$(nproc)
-cp busybox $ROOTFS/System/busybox
+cp -v busybox $ROOTFS/System/busybox
 popd
 
 pushd .
@@ -98,11 +101,11 @@ done
 popd
 
 echo "* Build Step: Adding files to rootfs *"
-cp /build-scripts/files/init-files/init $ROOTFS/init
-cp -r /build-scripts/files/etc/* $ROOTFS/etc/
-cp -r /build-scripts/files/usr/* $ROOTFS/usr/
+cp -v /build-scripts/files/init-files/init $ROOTFS/init
+cp -rv /build-scripts/files/etc/* $ROOTFS/etc/
+cp -rv /build-scripts/files/usr/* $ROOTFS/usr/
 # Sineware System Files
-cp -r /build-scripts/files/System/deno $ROOTFS/System/
+cp -rv /build-scripts/files/System/deno $ROOTFS/System/
 
 echo "* Building Additional System Components *"
 /build-scripts/components/bash/build.sh
@@ -133,3 +136,4 @@ echo "This ${SINEWARE_PRETTY_NAME} build was compiled on $(date)" > System/sinew
 tar -czvf /build-scripts/output/sineware.tar.gz .
 
 echo "* Done! *"
+bash
