@@ -1,5 +1,17 @@
 #!/usr/bin/env bash
 
+# Build Options
+export COMPILE_KERNEL=false # if false, use the precompiled kernel without modules to speed up local builds. (probably won't boot on anything but QEMU)
+export SINEWARE_ARCH=x86_64 # Supported options: x86_64
+
+# Names
+export SINEWARE_NAME="Sineware"
+export SINEWARE_VERSION="Development Milestone 1"
+export SINEWARE_ID="sineware"
+export SINEWARE_VERSION_ID="dev-m1-$(date '+%s')"
+
+export SINEWARE_PRETTY_NAME="$SINEWARE_NAME $SINEWARE_VERSION ($SINEWARE_VERSION_ID)"
+
 # Files
 export SINEWARE_REPO_LINUX=https://github.com/Sineware/linux.git
 export SINEWARE_REPO_GLIBC=https://github.com/Sineware/glibc.git
@@ -9,19 +21,9 @@ export SINEWARE_REPO_NEOFETCH=https://github.com/Sineware/neofetch.git
 export SINEWARE_REPO_NCURSES=https://github.com/Sineware/ncurses.git
 export SINEWARE_REPO_HTOP=https://github.com/Sineware/htop.git
 export SINEWARE_REPO_OPENSSH=https://github.com/Sineware/openssh.git
-
-# Build Options
-export COMPILE_KERNEL=true # use the small precompiled kernel to speed up local builds. (probably won't boot on anything but QEMU)
-export SINEWARE_ARCH=x86_64 # Supported options: x86_64
-
-# Names
-export SINEWARE_NAME="Sineware"
-export SINEWARE_VERSION="Development Milestone 1"
-export SINEWARE_ID="sineware"
-export SINEWARE_VERSION_ID="dev-m1"
-
-export SINEWARE_PRETTY_NAME="$SINEWARE_NAME $SINEWARE_VERSION ($SINEWARE_VERSION_ID)"
-
+export SINEWARE_REPO_LIBFUSE=https://github.com/Sineware/libfuse.git
+export SINEWARE_REPO_QEMU=https://github.com/Sineware/qemu.git
+export SINEWARE_REPO_GLIB=https://github.com/Sineware/GLib.git
 
 # Paths (do not modify?)
 export ROOTFS=/build/rootfs

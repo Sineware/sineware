@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 mkdir -p build-scripts/output
 rm -rf build-scripts/output/*
 docker build . -t sineware-build

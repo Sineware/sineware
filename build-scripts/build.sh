@@ -24,7 +24,7 @@ echo "* Build Step: Getting Ready *"
 
 mkdir -pv /build/rootfs && cd /build
 
-echo "* Build Step: Gathering Components *"
+echo "* Build Step: Gathering Initial Components *"
 git clone $SINEWARE_REPO_LINUX --depth 1
 git clone $SINEWARE_REPO_GLIBC --depth 1
 git clone $SINEWARE_REPO_BUSYBOX --depth 1
@@ -108,32 +108,53 @@ cp -rv /build-scripts/files/usr/* $ROOTFS/usr/
 cp -rv /build-scripts/files/System/deno $ROOTFS/System/
 
 echo "* Building Additional System Components *"
-/build-scripts/components/bash/build.sh
-/build-scripts/components/neofetch/build.sh
-/build-scripts/components/ncurses/build.sh
-/build-scripts/components/htop/build.sh
-/build-scripts/components/openssh/build.sh
 /build-scripts/components/library-patches/build.sh
 
-/build-scripts/files/System/CoreServices/build.sh
+/build-scripts/components/ncurses/build.sh
+/build-scripts/components/libfuse/build.sh
+/build-scripts/components/glib/build.sh
 
+/build-scripts/components/bash/build.sh
+/build-scripts/components/neofetch/build.sh
+/build-scripts/components/htop/build.sh
+/build-scripts/components/openssh/build.sh
+/build-scripts/components/qemu/build.sh
+
+# Sineware Components
+/build-scripts/files/System/CoreServices/build.sh
 /build-scripts/components/insert-name/build.sh
 
 echo "* Build Step: Finishing touches... *"
+pushd .
 # usr merge (todo bad idea?)
 mv $ROOTFS/bin/* $ROOTFS/usr/bin/
 rm -rf $ROOTFS/bin
 mv $ROOTFS/sbin/* $ROOTFS/usr/sbin/
 rm -rf $ROOTFS/sbin
 
+# wtf (bash couldn't find /usr/lib?)
+# maybe merge these 4 folders todo
+rsync -av $ROOTFS/usr/lib/ $ROOTFS/lib/
+rsync -av $ROOTFS/usr/lib64/* $ROOTFS/lib64
+
+rsync -av $ROOTFS/lib/* $ROOTFS/lib64
+
+cd $ROOTFS
+mkdir -pv bin sbin
+ln -s /usr/bin bin/
+ln -s /usr/sbin sbin/
+popd
+
 echo "* Build Step: Cleaning up *"
-#rm -rf $ROOTFS/var
 # todo remove unnecessary files
+rm -rf $ROOTFS/usr/include # don't need development headers probably
+rm -rf $ROOTFS/usr/lib
+rm -rf $ROOTFS/usr/lib64
+rm -rf $ROOTFS/lib
 
 echo "* Build Step: Creating rootfs archive *"
 cd $ROOTFS
-echo "This ${SINEWARE_PRETTY_NAME} build was compiled on $(date)" > System/sineware-release
+echo "This ${SINEWARE_PRETTY_NAME} build was completed on $(date)" > System/sineware-release
 tar -czvf /build-scripts/output/sineware.tar.gz .
 
 echo "* Done! *"
-bash
