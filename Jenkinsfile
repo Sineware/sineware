@@ -2,18 +2,6 @@ pipeline {
     agent any
 
     stages {
-        stage('Clone Git') {
-            steps {
-                checkout([$class: 'GitSCM',
-                    branches: [[name: '*/master' ]],
-                    extensions: scm.extensions,
-                    userRemoteConfigs: [[
-                        url: 'https://github.com/Sineware/sineware.git',
-                        credentialsId: 'JenkinsSSH'
-                    ]]
-                ])
-            }
-        }
         stage('Build RootFS') {
             steps {
                 echo 'Building Sineware...'
