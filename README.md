@@ -10,7 +10,7 @@ This is the main repository of Sineware, the perfect host for containers and VMs
 
 ---
 ### Building Sineware
-The `build-everything.sh` file will create a fresh rootfs tar.gz file (in ./build-scripts/output).
+The `SINEWARE_DEVELOPMENT=true build-everything.sh` command will create a fresh rootfs tar.gz file (in ./build-scripts/output).
 You need Docker on your system to run it! (Build testing will come eventually)
 
 Both Linux and macOS (Docker Desktop) are officially supported as build hosts.

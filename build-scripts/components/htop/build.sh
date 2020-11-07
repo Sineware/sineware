@@ -7,11 +7,8 @@ cd /build
 git clone $SINEWARE_REPO_HTOP --depth 1
 cd htop
 
-export CPPFLAGS='-I${ROOTFS}/usr/include/'
-export LDFLAGS='-L${ROOTFS}/lib/:${ROOTFS}/lib64/:${ROOTFS}/usr/lib/:${ROOTFS}/usr/lib64/'
-
 ./autogen.sh
-./configure --prefix /usr
+./configure --prefix /usr --host=x86_64-sineware-linux-gnu --build=x86_64-sineware-linux-gnu
 make -j$(nproc)
 make install DESTDIR=$ROOTFS
 

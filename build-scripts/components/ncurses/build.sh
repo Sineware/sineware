@@ -7,7 +7,8 @@ cd /build
 git clone $SINEWARE_REPO_NCURSES --depth 1
 cd ncurses
 
-./configure --prefix=/usr --with-termlib=tinfo --enable-widec --with-shared
+./configure --prefix=/usr --with-termlib=tinfo --enable-widec --with-shared \
+            --host=x86_64-sineware-linux-gnu --build=x86_64-sineware-linux-gnu
 make -j$(nproc)
 make install DESTDIR=$ROOTFS
 

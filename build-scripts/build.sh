@@ -22,11 +22,13 @@ source /build-scripts/build-configuration.sh
 
 echo "* Build Step: Getting Ready *"
 
+mkdir -pv /tools
+
 mkdir -pv /build/rootfs && cd /build
 
 echo "* Build Step: Gathering Initial Components *"
-git clone $SINEWARE_REPO_LINUX --depth 1
-git clone $SINEWARE_REPO_GLIBC --depth 1
+#git clone $SINEWARE_REPO_LINUX --depth 1
+#git clone $SINEWARE_REPO_GLIBC --depth 1
 git clone $SINEWARE_REPO_BUSYBOX --depth 1
 
 echo "* Step 3: Preparing Directories *"
@@ -55,16 +57,19 @@ mkdir -pv $ROOTFS/Data
 ls -l
 ls -l $ROOTFS
 
-echo "* Build Step: glibc *"
-pushd .
-cd $GLIBC_NAME
-mkdir -pv build
-cd build
-../configure --prefix=/usr
-make -j$(nproc)
-make install DESTDIR=$ROOTFS
-popd
-ls -l $ROOTFS
+# ~~ Build the Toolchain, environment variables were set in build-configuration
+/build-scripts/toolchain/build.sh
+
+#echo "* Build Step: glibc *"
+#pushd .
+#cd $GLIBC_NAME
+#mkdir -pv build
+#cd build
+#../configure --prefix=/usr --host=x86_64-sineware-linux-gnu --build=x86_64-sineware-linux-gnu
+#make -j$(nproc)
+#make install DESTDIR=$ROOTFS
+#popd
+#ls -l $ROOTFS
 
 echo "* Build Step: Kernel *"
 if [ "$COMPILE_KERNEL" = true ]
@@ -88,8 +93,8 @@ fi
 echo "* Build Step: BusyBox *"
 pushd .
 cd busybox
-make defconfig
-make -j$(nproc)
+make CROSS_COMPILE=${SINEWARE_TRIPLET}- defconfig
+make CROSS_COMPILE=${SINEWARE_TRIPLET}- -j$(nproc)
 cp -v busybox $ROOTFS/System/busybox
 popd
 
@@ -107,7 +112,7 @@ cp -rv /build-scripts/files/usr/* $ROOTFS/usr/
 # Sineware System Files
 cp -rv /build-scripts/files/System/deno $ROOTFS/System/
 
-echo "* Building Additional System Components *"
+echo "* Building Additional System Components (Part 1) *"
 /build-scripts/components/library-patches/build.sh
 
 /build-scripts/components/ncurses/build.sh
@@ -116,15 +121,14 @@ echo "* Building Additional System Components *"
 
 /build-scripts/components/bash/build.sh
 /build-scripts/components/neofetch/build.sh
-/build-scripts/components/htop/build.sh
-/build-scripts/components/openssh/build.sh
+#/build-scripts/components/openssh/build.sh
 /build-scripts/components/qemu/build.sh
 
 # Sineware Components
 /build-scripts/files/System/CoreServices/build.sh
 /build-scripts/components/insert-name/build.sh
 
-echo "* Build Step: Finishing touches... *"
+echo "* Build Step: Components Part 1: Finishing touches... *"
 pushd .
 # usr merge (todo bad idea?)
 mv $ROOTFS/bin/* $ROOTFS/usr/bin/
@@ -137,20 +141,23 @@ rm -rf $ROOTFS/sbin
 rsync -av $ROOTFS/usr/lib/ $ROOTFS/lib/
 rsync -av $ROOTFS/usr/lib64/* $ROOTFS/lib64
 
-rsync -av $ROOTFS/lib/* $ROOTFS/lib64
+rsync -av $ROOTFS/lib64/* $ROOTFS/lib
 
 cd $ROOTFS
 mkdir -pv bin sbin
 ln -s /usr/bin bin/
 ln -s /usr/sbin sbin/
+ln -s /lib lib64/
 popd
 
-echo "* Build Step: Cleaning up *"
+echo "* Build Step: Components Part 1: Cleaning up *"
 # todo remove unnecessary files
-rm -rf $ROOTFS/usr/include # don't need development headers probably
+#rm -rf $ROOTFS/usr/include # don't need development headers probably
 rm -rf $ROOTFS/usr/lib
 rm -rf $ROOTFS/usr/lib64
-rm -rf $ROOTFS/lib
+
+echo "* Build Step * Compiling Final Components"
+#/build-scripts/components/htop/build.sh
 
 echo "* Build Step: Creating rootfs archive *"
 cd $ROOTFS
