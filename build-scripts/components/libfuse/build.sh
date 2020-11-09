@@ -8,7 +8,7 @@ git clone $SINEWARE_REPO_LIBFUSE --depth 1
 cd libfuse
 
 ./makeconf.sh
-./configure --prefix=/usr --host=x86_64-sineware-linux-gnu --build=x86_64-sineware-linux-gnu
+./configure --prefix=/usr --host=${SINEWARE_TRIPLET} --build=${SINEWARE_TRIPLET}
 
 make -j$(nproc)
 make install DESTDIR=$ROOTFS

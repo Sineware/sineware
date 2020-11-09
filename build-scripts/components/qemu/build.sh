@@ -9,7 +9,9 @@ cd qemu
 
 mkdir build
 cd build
-../configure --prefix=/usr --target-list=x86_64-softmmu --host=x86_64-sineware-linux-gnu --build=x86_64-sineware-linux-gnu
+../configure --prefix=/usr --target-list=x86_64-softmmu \
+             --cc=x86_64-sineware-linux-gnu-gcc \
+             --cxx=x86_64-sineware-linux-gnu-g++
 make -j$(nproc)
 make install DESTDIR=$ROOTFS
 

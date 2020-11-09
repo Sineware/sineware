@@ -122,7 +122,7 @@ echo "* Building Additional System Components (Part 1) *"
 /build-scripts/components/bash/build.sh
 /build-scripts/components/neofetch/build.sh
 #/build-scripts/components/openssh/build.sh
-/build-scripts/components/qemu/build.sh
+#/build-scripts/components/qemu/build.sh
 
 # Sineware Components
 /build-scripts/files/System/CoreServices/build.sh

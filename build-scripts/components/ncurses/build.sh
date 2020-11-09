@@ -12,7 +12,7 @@ cd ncurses
             --without-debug         \
             --enable-pc-files       \
             --enable-widec          \
-            --host=x86_64-sineware-linux-gnu --build=x86_64-sineware-linux-gnu
+            --host=${SINEWARE_TRIPLET} --build=${SINEWARE_TRIPLET}
 
 make -j$(nproc)
 make install DESTDIR=$ROOTFS
