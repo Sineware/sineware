@@ -115,7 +115,6 @@ cp -rv /build-scripts/files/System/deno $ROOTFS/System/
 echo "* Building Additional System Components (Part 1) *"
 /build-scripts/components/library-patches/build.sh
 
-/build-scripts/components/ncurses/build.sh
 /build-scripts/components/libfuse/build.sh
 /build-scripts/components/glib/build.sh
 

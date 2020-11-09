@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
 
 # Build Options
-export COMPILE_KERNEL=false # if false, use the precompiled kernel without modules to speed up local builds. (probably won't boot on anything but QEMU)
+if [ "$SINEWARE_DEVELOPMENT" = true ] # passed by the build-everything script.
+then
+  # if false, use the precompiled kernel without modules to speed up local builds. (probably won't boot on anything but QEMU)
+  export COMPILE_KERNEL=false
+else
+  export COMPILE_KERNEL=true
+fi
 export SINEWARE_ARCH=x86_64 # Supported options: x86_64
 
 # Names
@@ -25,7 +31,7 @@ export SINEWARE_REPO_LIBFUSE=https://github.com/Sineware/libfuse.git
 export SINEWARE_REPO_QEMU=https://github.com/Sineware/qemu.git
 export SINEWARE_REPO_GLIB=https://github.com/Sineware/GLib.git
 
-export SINEWARE_BIN_URL=https://sineware.ca/dist/components/
+export SINEWARE_BIN_URL=https://sineware.ca/dist/components
 export SINEWARE_BIN_TOOLCHAIN=sineware-toolchain-1.tar.bz2
 
 # Toolchain

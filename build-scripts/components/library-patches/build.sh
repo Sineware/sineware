@@ -12,6 +12,7 @@ cd libffi-3.3
 ./configure --prefix /usr --host=x86_64-sineware-linux-gnu --build=x86_64-sineware-linux-gnu
 make -j$(nproc)
 make install DESTDIR=$ROOTFS
+cd $ROOTFS/usr/lib/
 
 # zlib
 cd /build
@@ -70,21 +71,27 @@ AR=${SINEWARE_TRIPLET}-ar \
 RANLIB=${SINEWARE_TRIPLET}-ranlib \
 make install DESTDIR=$ROOTFS
 
-# gcc
-#cp -v /lib64/libgcc_s.so.1 $ROOTFS/lib64/libgcc_s.so.1
+# libpixman
+cd /build
+wget https://www.cairographics.org/releases/pixman-0.40.0.tar.gz
+tar xvf pixman-0.40.0.tar.gz
+cd pixman-0.40.0
 
-# libstdc++
-#cp -rv /usr/lib64/libstdc++.so.6.0.28 $ROOTFS/usr/lib64/
-#cp -rv /usr/lib64/libstdc++.so.6 $ROOTFS/usr/lib64/
+./configure --prefix /usr --host=x86_64-sineware-linux-gnu --build=x86_64-sineware-linux-gnu
+make -j$(nproc)
+make install DESTDIR=$ROOTFS
 
-# todo remove the cp's eventually! this is bad
+# ncurses/tinfo
+/build-scripts/components/ncurses/build.sh
 
-# OpenSSL
-#cp -rv /usr/lib64/libcrypto.so.1.1 $ROOTFS/usr/lib64/
-#cp -rv /usr/lib64/libcrypto.so $ROOTFS/usr/lib64/
+# util-linux
+cd /build
+wget https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.36/util-linux-2.36.tar.xz
+tar xvf util-linux-2.36.tar.xz
+cd util-linux-2.36
 
-# libz
-#cp -rv /lib64/libz.so.1.2.11 $ROOTFS/lib64/
-#cp -rv /lib64/libz.so.1 $ROOTFS/lib64/
+./configure --prefix /usr --host=x86_64-sineware-linux-gnu --build=x86_64-sineware-linux-gnu --disable-widechar
+make -j$(nproc)
+make install DESTDIR=$ROOTFS
 
 popd
