@@ -27,7 +27,7 @@ mkdir -pv /tools
 mkdir -pv /build/rootfs && cd /build
 
 echo "* Build Step: Gathering Initial Components *"
-#git clone $SINEWARE_REPO_LINUX --depth 1
+git clone $SINEWARE_REPO_LINUX --depth 1
 #git clone $SINEWARE_REPO_GLIBC --depth 1
 git clone $SINEWARE_REPO_BUSYBOX --depth 1
 
@@ -60,6 +60,7 @@ ls -l $ROOTFS
 # ~~ Build the Toolchain, environment variables were set in build-configuration
 /build-scripts/toolchain/build.sh
 
+# Comes with crosstool-NG
 #echo "* Build Step: glibc *"
 #pushd .
 #cd $GLIBC_NAME
