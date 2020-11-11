@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"io/ioutil"
-	"net"
-	"strings"
+	//"github.com/gin-gonic/gin"
+	//"io/ioutil"
+	//"net"
+	//"strings"
 )
 
 
@@ -13,6 +13,7 @@ func main() {
 
 	printStatusScreen();
 
+/*
 	// HTTP Server (JSON API)
 	gin.SetMode(gin.ReleaseMode)
 	gin.DefaultWriter = ioutil.Discard // todo enable logging
@@ -28,7 +29,7 @@ func main() {
 			"ipAddress": findIPAddress(),
 		})
 	})
-	_ = r.Run("0.0.0.0:8086") // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	_ = r.Run("0.0.0.0:8086") // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")*/
 }
 
 func printStatusScreen() {
@@ -55,7 +56,7 @@ func printStatusScreen() {
 }
 
 // https://stackoverflow.com/a/22951591
-func findIPAddress() string {
+/*func findIPAddress() string {
 	if interfaces, err := net.Interfaces(); err == nil {
 		for _, interfac := range interfaces {
 			if interfac.HardwareAddr.String() != "" {
@@ -76,4 +77,8 @@ func findIPAddress() string {
 		}
 	}
 	return ""
+}*/
+
+func findIPAddress() string {
+    return "???"
 }

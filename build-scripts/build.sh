@@ -72,25 +72,6 @@ ls -l $ROOTFS
 #popd
 #ls -l $ROOTFS
 
-echo "* Build Step: Kernel *"
-if [ "$COMPILE_KERNEL" = true ]
-then
-  pushd . # Running pushd saves the current directory then popd brings us back there.
-  cd $KERNEL_NAME
-  echo "Build for ${SINEWARE_ARCH}"
-  #make ${SINEWARE_ARCH}_defconfig
-  #make menuconfig
-  # todo check arch and use that kernel config
-  cp -v /build-scripts/files/kernel/${SINEWARE_ARCH}/.config .
-  make -j$(nproc)
-  cp -v arch/${SINEWARE_ARCH}/boot/bzImage $ROOTFS/boot/bzImage
-  make modules_install INSTALL_MOD_PATH=$ROOTFS
-  popd
-else
-  echo "Development Build Only: Using prebuilt kernel image..."
-  cp -v /build-scripts/files/kernel/${SINEWARE_ARCH}/bzImage $ROOTFS/boot/bzImage
-fi
-
 echo "* Build Step: BusyBox *"
 pushd .
 cd busybox
@@ -158,6 +139,26 @@ rm -rf $ROOTFS/usr/lib64
 
 echo "* Build Step * Compiling Final Components"
 #/build-scripts/components/htop/build.sh
+
+echo "* Build Step: Kernel *"
+if [ "$COMPILE_KERNEL" = true ]
+then
+  pushd . # Running pushd saves the current directory then popd brings us back there.
+  cd $KERNEL_NAME
+  echo "Build for ${SINEWARE_ARCH}"
+  #make ${SINEWARE_ARCH}_defconfig
+  #make menuconfig
+  # todo check arch and use that kernel config
+  cp -v /build-scripts/files/kernel/${SINEWARE_ARCH}/.config .
+  make CROSS_COMPILE=${SINEWARE_TRIPLET}- -j$(nproc)
+  cp -v arch/${SINEWARE_ARCH}/boot/bzImage $ROOTFS/boot/bzImage
+  make CROSS_COMPILE=${SINEWARE_TRIPLET}- modules_install INSTALL_MOD_PATH=$ROOTFS
+  popd
+else
+  echo "Development Build Only: Using prebuilt kernel image..."
+  cp -v /build-scripts/files/kernel/${SINEWARE_ARCH}/bzImage $ROOTFS/boot/bzImage
+fi
+
 
 echo "* Build Step: Creating rootfs archive *"
 cd $ROOTFS
