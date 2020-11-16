@@ -8,13 +8,19 @@ then
 else
   export COMPILE_KERNEL=true
 fi
-export SINEWARE_ARCH=x86_64 # Supported options: x86_64
+
+export SINEWARE_ARCH=$(uname -m)
+export SINEWARE_SUPPORTED_ARCH=("x86_64" "aarch64")
+if [[ ! " ${SINEWARE_SUPPORTED_ARCH[@]} " =~ " ${SINEWARE_ARCH} " ]]; then
+  echo "ERROR: Invalid Build Architecture (${SINEWARE_ARCH})! "
+  exit 1
+fi
 
 # Names
 export SINEWARE_NAME="Sineware"
 export SINEWARE_VERSION="Development Milestone 1"
 export SINEWARE_ID="sineware"
-export SINEWARE_VERSION_ID="dev-m1-$(date '+%s')"
+export SINEWARE_VERSION_ID="dev-m1-$(date '+%s')-${SINEWARE_ARCH}"
 
 export SINEWARE_PRETTY_NAME="$SINEWARE_NAME $SINEWARE_VERSION ($SINEWARE_VERSION_ID)"
 
@@ -32,10 +38,10 @@ export SINEWARE_REPO_QEMU=https://github.com/Sineware/qemu.git
 export SINEWARE_REPO_GLIB=https://github.com/Sineware/GLib.git
 
 export SINEWARE_BIN_URL=https://sineware.ca/dist/components
-export SINEWARE_BIN_TOOLCHAIN=sineware-toolchain-1.tar.bz2
+export SINEWARE_BIN_TOOLCHAIN=${SINEWARE_ARCH}-sineware-toolchain-1.tar.bz2
 
 # Toolchain
-export SINEWARE_TRIPLET=x86_64-sineware-linux-gnu
+export SINEWARE_TRIPLET=${SINEWARE_ARCH}-sineware-linux-gnu
 export PATH="${PATH}:/build/toolchain/bin"
 
 # Paths (do not modify)

@@ -31,7 +31,7 @@ echo "* Build Step: Gathering Initial Components *"
 cd /build
 
 git clone $SINEWARE_REPO_BUSYBOX --depth 1
-wget https://distfiles.adelielinux.org/adelie/1.0/iso/rc2/adelie-rootfs-x86_64-1.0-rc2.txz
+wget https://distfiles.adelielinux.org/adelie/1.0/iso/rc2/adelie-rootfs-${SINEWARE_ARCH}-1.0-rc2.txz
 
 # ~~ Build the Toolchain, environment variables were set in build-configuration
 /build-scripts/toolchain/build.sh
