@@ -27,38 +27,37 @@ mkdir -pv /tools
 mkdir -pv /build/rootfs && cd /build
 
 echo "* Build Step: Gathering Initial Components *"
-git clone $SINEWARE_REPO_LINUX --depth 1
-#git clone $SINEWARE_REPO_GLIBC --depth 1
-git clone $SINEWARE_REPO_BUSYBOX --depth 1
 
-echo "* Step 3: Preparing Directories *"
-# These are temporary and will be removed at the end of the build process.
+cd /build
+
+git clone $SINEWARE_REPO_BUSYBOX --depth 1
+wget https://distfiles.adelielinux.org/adelie/1.0/iso/rc2/adelie-rootfs-x86_64-1.0-rc2.txz
+
+# ~~ Build the Toolchain, environment variables were set in build-configuration
+/build-scripts/toolchain/build.sh
+
+
+echo "* Build Step: Preparing Directories *"
+mkdir -pv $ROOTFS/root_a $ROOTFS/root_b
+mkdir -pv $ROOTFS/data
+
 mkdir -pv $ROOTFS/bin
 mkdir -pv $ROOTFS/sbin
-
 mkdir -pv $ROOTFS/usr/bin
 mkdir -pv $ROOTFS/usr/sbin
 
-mkdir -pv $ROOTFS/proc
-mkdir -pv $ROOTFS/sys
-mkdir -pv $ROOTFS/dev
-mkdir -pv $ROOTFS/etc
-mkdir -pv $ROOTFS/tmp
 mkdir -pv $ROOTFS/boot
-mkdir -pv $ROOTFS/lib
 
-# These are temporary and will be removed at the end of the build process.
-#mkdir -pv $ROOTFS/lib
-mkdir -pv $ROOTFS/lib64
-
-mkdir -pv $ROOTFS/System
-mkdir -pv $ROOTFS/Data
+mkdir -pv $ROOTFS/dev mkdir -pv $ROOTFS/proc mkdir -pv $ROOTFS/sys
 
 ls -l
 ls -l $ROOTFS
 
-# ~~ Build the Toolchain, environment variables were set in build-configuration
-/build-scripts/toolchain/build.sh
+echo "* Build Step: Extracting Adelie RootFS *"
+pushd .
+cd $ROOTFS/root_a
+tar xvf /build/adelie-rootfs-x86_64-1.0-rc2.txz
+popd
 
 # Comes with crosstool-NG
 #echo "* Build Step: glibc *"
@@ -77,65 +76,69 @@ pushd .
 cd busybox
 make CROSS_COMPILE=${SINEWARE_TRIPLET}- defconfig
 make CROSS_COMPILE=${SINEWARE_TRIPLET}- -j$(nproc)
-cp -v busybox $ROOTFS/System/busybox
+cp -v busybox $ROOTFS/busybox
 popd
 
 pushd .
 cd $ROOTFS
-for util in $($ROOTFS/System/busybox --list-full); do
-  ln -s /System/busybox $util
+for util in $($ROOTFS/busybox --list-full); do
+  ln -s /busybox $util
 done
 popd
 
 echo "* Build Step: Adding files to rootfs *"
 cp -v /build-scripts/files/init-files/init $ROOTFS/init
-cp -rv /build-scripts/files/etc/* $ROOTFS/etc/
-cp -rv /build-scripts/files/usr/* $ROOTFS/usr/
+touch $ROOTFS/sineware.ini
+cat <<EOT >> $ROOTFS/sineware.ini
+hello=world
+EOT
+#cp -rv /build-scripts/files/etc/* $ROOTFS/etc/
+#cp -rv /build-scripts/files/usr/* $ROOTFS/usr/
 # Sineware System Files
-cp -rv /build-scripts/files/System/deno $ROOTFS/System/
-
-echo "* Building Additional System Components (Part 1) *"
-/build-scripts/components/library-patches/build.sh
-
-/build-scripts/components/libfuse/build.sh
-/build-scripts/components/glib/build.sh
-
-/build-scripts/components/bash/build.sh
-/build-scripts/components/neofetch/build.sh
+#cp -rv /build-scripts/files/System/deno $ROOTFS/System/
+#
+#echo "* Building Additional System Components (Part 1) *"
+#/build-scripts/components/library-patches/build.sh
+#
+#/build-scripts/components/libfuse/build.sh
+#/build-scripts/components/glib/build.sh
+#
+#/build-scripts/components/bash/build.sh
+#/build-scripts/components/neofetch/build.sh
 #/build-scripts/components/openssh/build.sh
 #/build-scripts/components/qemu/build.sh
 
 # Sineware Components
-/build-scripts/files/System/CoreServices/build.sh
-/build-scripts/components/insert-name/build.sh
-
-echo "* Build Step: Components Part 1: Finishing touches... *"
-pushd .
+#/build-scripts/files/System/CoreServices/build.sh
+#/build-scripts/components/insert-name/build.sh
+#
+#echo "* Build Step: Components Part 1: Finishing touches... *"
+#pushd .
 # usr merge (todo bad idea?)
-mv $ROOTFS/bin/* $ROOTFS/usr/bin/
-rm -rf $ROOTFS/bin
-mv $ROOTFS/sbin/* $ROOTFS/usr/sbin/
-rm -rf $ROOTFS/sbin
-
+#mv $ROOTFS/bin/* $ROOTFS/usr/bin/
+#rm -rf $ROOTFS/bin
+#mv $ROOTFS/sbin/* $ROOTFS/usr/sbin/
+#rm -rf $ROOTFS/sbin
+#
 # wtf (bash couldn't find /usr/lib?)
 # maybe merge these 4 folders todo
-rsync -av $ROOTFS/usr/lib/ $ROOTFS/lib/
-rsync -av $ROOTFS/usr/lib64/* $ROOTFS/lib64
+#rsync -av $ROOTFS/usr/lib/ $ROOTFS/lib/
+#rsync -av $ROOTFS/usr/lib64/* $ROOTFS/lib64
 
-rsync -av $ROOTFS/lib64/* $ROOTFS/lib
+#rsync -av $ROOTFS/lib64/* $ROOTFS/lib
 
-cd $ROOTFS
-mkdir -pv bin sbin
-ln -s /usr/bin bin/
-ln -s /usr/sbin sbin/
-ln -s /lib lib64/
-popd
+#cd $ROOTFS
+#mkdir -pv bin sbin
+#ln -s /usr/bin bin/
+#ln -s /usr/sbin sbin/
+#ln -s /lib lib64/
+#popd
 
 echo "* Build Step: Components Part 1: Cleaning up *"
 # todo remove unnecessary files
 #rm -rf $ROOTFS/usr/include # don't need development headers probably
-rm -rf $ROOTFS/usr/lib
-rm -rf $ROOTFS/usr/lib64
+#rm -rf $ROOTFS/usr/lib
+#rm -rf $ROOTFS/usr/lib64
 
 echo "* Build Step * Compiling Final Components"
 #/build-scripts/components/htop/build.sh
@@ -162,7 +165,7 @@ fi
 
 echo "* Build Step: Creating rootfs archive *"
 cd $ROOTFS
-echo "This ${SINEWARE_PRETTY_NAME} build was completed on $(date)" > System/sineware-release
+echo "This ${SINEWARE_PRETTY_NAME} build was completed on $(date)" > ./sineware-release
 tar -czvf /build-scripts/output/sineware.tar.gz .
 
 echo "* Done! *"

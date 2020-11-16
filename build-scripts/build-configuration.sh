@@ -38,18 +38,6 @@ export SINEWARE_BIN_TOOLCHAIN=sineware-toolchain-1.tar.bz2
 export SINEWARE_TRIPLET=x86_64-sineware-linux-gnu
 export PATH="${PATH}:/build/toolchain/bin"
 
-#export CC=${SINEWARE_TRIPLET}-gcc
-#export CPP=${SINEWARE_TRIPLET}-g++
-#export CXX=${SINEWARE_TRIPLET}-g++
-##export LD=${SINEWARE_TRIPLET}-ld
-#export CROSS_COMPILE=${SINEWARE_TRIPLET}-
-#export CHOST=${SINEWARE_TRIPLET}
-
-
-#export CPPFLAGS="-I${ROOTFS}/usr/"
-#export CFLAGS="-I${ROOTFS}/usr/include"
-#export LDFLAGS="-L${ROOTFS}/lib -L${ROOTFS}/lib64 -L${ROOTFS}/usr/lib -L${ROOTFS}/usr/lib64"
-
 # Paths (do not modify)
 #export ROOTFS=/build/rootfs
 export ROOTFS=/build/toolchain/${SINEWARE_TRIPLET}/sysroot

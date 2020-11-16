@@ -1,26 +1,36 @@
-#!/usr/bin/sh
+#!/bin/sh
 clear
 echo "Starting Sineware..."
 mount -t proc proc /proc
 mount -t sysfs sysfs /sys
-mount -o mode=1777,nosuid,nodev -t tmpfs tmpfs /tmp
-mount -o mode=1777,nosuid,nodev -t tmpfs tmpfs /var
-mkdir -p /var/run
+#mount -o mode=1777,nosuid,nodev -t tmpfs tmpfs /tmp
+#mount -o mode=1777,nosuid,nodev -t tmpfs tmpfs /var
+#mkdir -p /var/run
 
 echo "Detecting devices..."
 mount -t devtmpfs devtmpfs /dev
 
 echo "Getting ready..."
-hostname -F /etc/hostname
+#hostname -F /etc/hostname
 
 # todo replace with NetworkManager or similar
-ifconfig lo up
+#ifconfig lo up
 #ifconfig eth0 up
-udhcpc -i eth0
+#udhcpc -i eth0
 
 # todo find and mount /Data
-mount /dev/sda /Data
+#mount /dev/sda /Data
+echo ""
+cat /sineware-release
+echo ""
+cat <<EOT
+Copyright (C) 2020 Seshan Ravikumar
+    This program comes with ABSOLUTELY NO WARRANTY.
+    This is free software, and you are welcome to redistribute it
+    under the conditions of the GNU GPLv3 or later.
 
-cat /System/sineware-release
-echo "Switching to linuxrc..."
-exec /linuxrc
+Development Build. For Evaluation Purposes Only.
+
+EOT
+echo "Dropping to debug shell..."
+/bin/sh
