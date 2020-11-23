@@ -1,3 +1,18 @@
+//  Copyright (C) 2020 Seshan Ravikumar
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 #include <unistd.h> // mmm POSIX
 #include <sys/mount.h>
 #include <cerrno>
@@ -5,8 +20,10 @@
 #include <fstream>
 #include <csignal>
 #include <sys/wait.h>
+#include <vector>
 
 #include "inipp.h"
+#include "running_process.h"
 
 bool is_booting = true;
 
@@ -17,8 +34,15 @@ void fatal_error(const std::string& err_msg);
 
 sigset_t set;
 
+// List of running processes.
+std::vector<running_process> processes;
+
 // adapted from sinit
-static void spawn(char *const argv[]) {
+static void spawn(running_process& proc) {
+    char * exec = new char [proc.exec.length()+1];
+    std::strcpy(exec, proc.exec.c_str());
+
+    char *const argv[]  = { exec, NULL }; // temp
     int pid = fork();
     switch (pid) {
         case 0:
@@ -32,6 +56,7 @@ static void spawn(char *const argv[]) {
             perror("fork");
         default:
             std::cout << "Started Child Process with PID " << pid << std::endl;
+            proc.pid = pid;
     }
 }
 
@@ -54,6 +79,21 @@ int main() {
     std::string config_init;
     inipp::extract(ini.sections["sineware"]["init"], config_init);
     std::cout << "Starting with processes: " << config_init << std::endl;
+
+    std::stringstream ss(config_init);
+
+    while( ss.good() ) {
+        std::string proc_name;
+        std::getline( ss, proc_name, ',' );
+        running_process proc;
+        proc.name = proc_name;
+
+        std::string proc_exec;
+        inipp::extract(ini.sections[proc_name]["exec"], proc_exec);
+        proc.exec = proc_exec;
+
+        processes.push_back(proc);
+    }
 
     sethostname("sineware-live", 13);
 
@@ -97,17 +137,19 @@ int main() {
     // Add signals to the set
     sigaddset(&set, SIGINT);
     sigaddset(&set, SIGCHLD);
+    sigaddset(&set, SIGUSR1);
 
     // Block all signals we set (i.e make them caught by sigwait)
     sigprocmask(SIG_BLOCK, &set, NULL);
 
+    // Boot the processes!
+    for(running_process& proc: processes) {
+        update_boot_screen("Starting Process: " + proc.name);
+        spawn(proc);
+    }
+
     int sig;
-
-    char *const rcinitcmd[]  = { "/bin/bash", NULL }; // temp
-
     while(true) {
-        spawn(rcinitcmd);
-
         is_booting = false;
         print_status_screen();
 
@@ -121,6 +163,17 @@ int main() {
                 std::cout << "caught sigchld (a child process has exited)" << std::endl;
                 std::cout << "The Signal is " << sig << std::endl;
                 std::cout << "The Child was " << pid << std::endl;
+                while (waitpid(-1, NULL, WNOHANG) > 0); // Reap the child
+                for(running_process& proc: processes) {
+                    if(proc.pid == pid) {
+                        std::cout << "Respawning Child " << proc.name << std::endl;
+                        spawn(proc);
+                        break;
+                    }
+                }
+                break;
+            case SIGUSR1:
+                // todo use this to make init do stuff
                 break;
             default:
                 std::cout << "The Signal is " << sig << std::endl;

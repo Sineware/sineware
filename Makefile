@@ -1,7 +1,7 @@
 SINEWARE_DEVELOPMENT ?= false
 BUILD_CONTAINER ?= true
 
-all: clean build-container adelie_rootfs system_rootfs sineware_img
+all: clean build_container adelie_rootfs system_rootfs sineware_img
 	@echo "Sineware Build Complete!"
 	@date
 
