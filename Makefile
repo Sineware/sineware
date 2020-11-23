@@ -15,7 +15,7 @@ clean:
 	rm -rf build-scripts/output/*
 	rm -rf iso-build-scripts/output/*
 
-build-container:
+build_container:
 ifeq ($(BUILD_CONTAINER),true)
 	@echo "Building the Docker build container"
 	docker build . -t sineware-build
