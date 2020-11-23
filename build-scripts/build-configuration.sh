@@ -1,4 +1,13 @@
 #!/usr/bin/env bash
+export SINEWARE_ARCH=$(uname -m)
+
+# Names
+export SINEWARE_NAME="Sineware"
+export SINEWARE_VERSION="Development Milestone 2"
+export SINEWARE_ID="sineware"
+export SINEWARE_VERSION_ID="dev-m2-$(date '+%s')-${SINEWARE_ARCH}"
+
+export SINEWARE_PRETTY_NAME="$SINEWARE_NAME $SINEWARE_VERSION ($SINEWARE_VERSION_ID)"
 
 # Build Options
 if [ "$SINEWARE_DEVELOPMENT" = true ] # passed by the build-everything script.
@@ -8,21 +17,13 @@ then
 else
   export COMPILE_KERNEL=true
 fi
+export SINEWARE_UBUNTU_KERNEL_VERSION=5.4.0-53-generic
 
-export SINEWARE_ARCH=$(uname -m)
 export SINEWARE_SUPPORTED_ARCH=("x86_64" "aarch64")
 if [[ ! " ${SINEWARE_SUPPORTED_ARCH[@]} " =~ " ${SINEWARE_ARCH} " ]]; then
   echo "ERROR: Invalid Build Architecture (${SINEWARE_ARCH})! "
   exit 1
 fi
-
-# Names
-export SINEWARE_NAME="Sineware"
-export SINEWARE_VERSION="Development Milestone 1"
-export SINEWARE_ID="sineware"
-export SINEWARE_VERSION_ID="dev-m1-$(date '+%s')-${SINEWARE_ARCH}"
-
-export SINEWARE_PRETTY_NAME="$SINEWARE_NAME $SINEWARE_VERSION ($SINEWARE_VERSION_ID)"
 
 # Files
 export SINEWARE_REPO_LINUX=https://github.com/Sineware/linux.git

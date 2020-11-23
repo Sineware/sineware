@@ -1,5 +1,6 @@
 #!/bin/sh
 clear
+# todo this is a super duper temporary "init"
 echo "Starting Sineware..."
 mount -t proc proc /proc
 mount -t sysfs sysfs /sys
@@ -9,9 +10,16 @@ mount -t sysfs sysfs /sys
 
 echo "Detecting devices..."
 mount -t devtmpfs devtmpfs /dev
+echo "/sbin/mdev" > /proc/sys/kernel/hotplug
+mdev -s
+sleep 2
+find /sys/devices -name modalias -type f -print0 | xargs -0 sort -u | \
+	xargs modprobe -ab 2>/dev/null
+
+sleep 2
 
 echo "Getting ready..."
-#hostname -F /etc/hostname
+hostname -F /etc/hostname
 
 # todo replace with NetworkManager or similar
 #ifconfig lo up
@@ -20,6 +28,15 @@ echo "Getting ready..."
 
 # todo find and mount /Data
 #mount /dev/sda /Data
+
+mount -o remount,rw /
+
+cd root_a/
+mount -t proc /proc proc/
+mount --rbind /sys sys/
+mount --rbind /dev dev/
+cd ..
+
 echo ""
 cat /sineware-release
 echo ""
@@ -32,5 +49,20 @@ Copyright (C) 2020 Seshan Ravikumar
 Development Build. For Evaluation Purposes Only.
 
 EOT
+
+# I have no clue what I am doing
+echo "Starting Adélie on root_a..."
+
+chroot /root_a /bin/sh -c "neofetch"
+
+echo "Welcome to Sineware!"
+echo "(An administrative logon prompt is available on tty2, "
+echo "press Ctrl+Alt+F2 to access it)"
+echo "(Access to the Sineware Boot Environment is available on tty3)"
+echo "Go get your noodles!"
+
+/sbin/getty -l /bin/login 38400 tty3 &
+chroot /root_a /sbin/agetty -l /bin/login 38400 tty2 &
+
 echo "Dropping to debug shell..."
 /bin/sh

@@ -15,6 +15,8 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 set -e # Crash when a command fails
+
+
 echo "* Starting $SINEWARE_PRETTY_NAME build on $(date) *"
 echo "Go get your noodles, this may take a while!"
 
@@ -31,11 +33,10 @@ echo "* Build Step: Gathering Initial Components *"
 cd /build
 
 git clone $SINEWARE_REPO_BUSYBOX --depth 1
-wget https://distfiles.adelielinux.org/adelie/1.0/iso/rc2/adelie-rootfs-${SINEWARE_ARCH}-1.0-rc2.txz
+wget https://distfiles.adelielinux.org/adelie/1.0/iso/rc2/adelie-rootfs-mini-${SINEWARE_ARCH}-1.0-rc2.txz
 
 # ~~ Build the Toolchain, environment variables were set in build-configuration
 /build-scripts/toolchain/build.sh
-
 
 echo "* Build Step: Preparing Directories *"
 mkdir -pv $ROOTFS/root_a $ROOTFS/root_b
@@ -56,83 +57,45 @@ ls -l $ROOTFS
 echo "* Build Step: Extracting Adelie RootFS *"
 pushd .
 cd $ROOTFS/root_a
-tar xvf /build/adelie-rootfs-x86_64-1.0-rc2.txz
+tar xvf /build/adelie-rootfs-mini-${SINEWARE_ARCH}-1.0-rc2.txz
 popd
 
-# Comes with crosstool-NG
-#echo "* Build Step: glibc *"
+#echo "* Build Step: BusyBox *"
 #pushd .
-#cd $GLIBC_NAME
-#mkdir -pv build
-#cd build
-#../configure --prefix=/usr --host=x86_64-sineware-linux-gnu --build=x86_64-sineware-linux-gnu
-#make -j$(nproc)
-#make install DESTDIR=$ROOTFS
+#cd busybox
+#make CROSS_COMPILE=${SINEWARE_TRIPLET}- defconfig
+#make CROSS_COMPILE=${SINEWARE_TRIPLET}- -j$(nproc)
+#cp -v busybox $ROOTFS/busybox
 #popd
-#ls -l $ROOTFS
-
-echo "* Build Step: BusyBox *"
-pushd .
-cd busybox
-make CROSS_COMPILE=${SINEWARE_TRIPLET}- defconfig
-make CROSS_COMPILE=${SINEWARE_TRIPLET}- -j$(nproc)
-cp -v busybox $ROOTFS/busybox
-popd
-
-pushd .
-cd $ROOTFS
-for util in $($ROOTFS/busybox --list-full); do
-  ln -s /busybox $util
-done
-popd
+#
+#pushd .
+#cd $ROOTFS
+#for util in $($ROOTFS/busybox --list-full); do
+#  ln -s /busybox $util
+#done
+#popd
 
 echo "* Build Step: Adding files to rootfs *"
-cp -v /build-scripts/files/init-files/init $ROOTFS/init
+#cp -v /build-scripts/files/init-files/init $ROOTFS/init
+
+pushd .
+cd /build-scripts/components/sineware-init
+make CXX=${SINEWARE_ARCH}-sineware-linux-gnu-g++
+make install DESTDIR=${ROOTFS}
+
 touch $ROOTFS/sineware.ini
 cat <<EOT >> $ROOTFS/sineware.ini
-hello=world
+[sineware]
+version=${SINEWARE_VERSION_ID}
+init=bash
+
+[bash]
+exec=/bin/bash
 EOT
 #cp -rv /build-scripts/files/etc/* $ROOTFS/etc/
-#cp -rv /build-scripts/files/usr/* $ROOTFS/usr/
-# Sineware System Files
-#cp -rv /build-scripts/files/System/deno $ROOTFS/System/
-#
-#echo "* Building Additional System Components (Part 1) *"
-#/build-scripts/components/library-patches/build.sh
-#
-#/build-scripts/components/libfuse/build.sh
-#/build-scripts/components/glib/build.sh
-#
-#/build-scripts/components/bash/build.sh
-#/build-scripts/components/neofetch/build.sh
-#/build-scripts/components/openssh/build.sh
-#/build-scripts/components/qemu/build.sh
 
 # Sineware Components
-#/build-scripts/files/System/CoreServices/build.sh
 #/build-scripts/components/insert-name/build.sh
-#
-#echo "* Build Step: Components Part 1: Finishing touches... *"
-#pushd .
-# usr merge (todo bad idea?)
-#mv $ROOTFS/bin/* $ROOTFS/usr/bin/
-#rm -rf $ROOTFS/bin
-#mv $ROOTFS/sbin/* $ROOTFS/usr/sbin/
-#rm -rf $ROOTFS/sbin
-#
-# wtf (bash couldn't find /usr/lib?)
-# maybe merge these 4 folders todo
-#rsync -av $ROOTFS/usr/lib/ $ROOTFS/lib/
-#rsync -av $ROOTFS/usr/lib64/* $ROOTFS/lib64
-
-#rsync -av $ROOTFS/lib64/* $ROOTFS/lib
-
-#cd $ROOTFS
-#mkdir -pv bin sbin
-#ln -s /usr/bin bin/
-#ln -s /usr/sbin sbin/
-#ln -s /lib lib64/
-#popd
 
 echo "* Build Step: Components Part 1: Cleaning up *"
 # todo remove unnecessary files
@@ -143,25 +106,42 @@ echo "* Build Step: Components Part 1: Cleaning up *"
 echo "* Build Step * Compiling Final Components"
 #/build-scripts/components/htop/build.sh
 
-echo "* Build Step: Kernel *"
-if [ "$COMPILE_KERNEL" = true ]
-then
-  pushd . # Running pushd saves the current directory then popd brings us back there.
-  cd $KERNEL_NAME
-  echo "Build for ${SINEWARE_ARCH}"
-  #make ${SINEWARE_ARCH}_defconfig
-  #make menuconfig
-  # todo check arch and use that kernel config
-  cp -v /build-scripts/files/kernel/${SINEWARE_ARCH}/.config .
-  make CROSS_COMPILE=${SINEWARE_TRIPLET}- -j$(nproc)
-  cp -v arch/${SINEWARE_ARCH}/boot/bzImage $ROOTFS/boot/bzImage
-  make CROSS_COMPILE=${SINEWARE_TRIPLET}- modules_install INSTALL_MOD_PATH=$ROOTFS
-  popd
-else
-  echo "Development Build Only: Using prebuilt kernel image..."
-  cp -v /build-scripts/files/kernel/${SINEWARE_ARCH}/bzImage $ROOTFS/boot/bzImage
-fi
 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ todo eventually this should be separate for update purposes
+echo "* Build Step * Setting up Adelie (in chroot)"
+pushd .
+cd $ROOTFS/root_a
+#mount -t proc /proc proc/
+#mount --rbind /sys sys/
+#mount --rbind /dev dev/
+
+cp /etc/resolv.conf etc/resolv.conf
+
+chroot $ROOTFS/root_a /sbin/apk update
+chroot $ROOTFS/root_a /sbin/apk add bash wget
+chroot $ROOTFS/root_a /bin/sh -c "cd /sbin && wget https://raw.githubusercontent.com/dylanaraps/neofetch/master/neofetch && chmod +x neofetch"
+popd
+echo "* Build Step: Kernel *"
+# Sineware Ubuntu HWE Compatible Kernel
+# todo this should be part of image generation not rootfs
+pushd .
+mkdir -pv /build/kernel && cd /build/kernel
+
+apt download linux-image-${SINEWARE_UBUNTU_KERNEL_VERSION}
+apt download linux-modules-${SINEWARE_UBUNTU_KERNEL_VERSION}
+
+# kernel image
+dpkg-deb -xv linux-image-*.deb .
+cp -v boot/vmlinuz* $ROOTFS/boot/bzImage
+
+# kernel modules
+dpkg-deb -xv linux-modules-*.deb .
+cp -v boot/System.map* $ROOTFS/boot/
+cp -v boot/config* $ROOTFS/boot/
+
+cp -rv lib/* $ROOTFS/lib/
+
+popd
 
 echo "* Build Step: Creating rootfs archive *"
 cd $ROOTFS

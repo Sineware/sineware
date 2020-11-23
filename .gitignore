@@ -3,3 +3,4 @@ iso-build-scripts/output/sineware.iso
 sineware.qcow2
 .DS_Store
 .idea
+artifacts

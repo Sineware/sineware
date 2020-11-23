@@ -2,18 +2,37 @@ pipeline {
     agent any
 
     stages {
-        stage('Build RootFS') {
+        stage('Prepare Build Environment') {
+                steps {
+                    echo 'Preparing directories...'
+                    sh 'make clean'
+                }
+        }
+        stage('Build Docker Container') {
             steps {
-                echo 'Building Sineware...'
-                sh './build-everything.sh'
-                archiveArtifacts artifacts: 'build-scripts/output/sineware.tar.gz', fingerprint: true
+                echo 'Building the Docker container...'
+                sh 'make build_container'
             }
         }
-        stage('Build Test ISO') {
+        stage('Build Adelie RootFS') {
             steps {
-                echo 'Building Sineware Testing ISO...'
-                sh './build-iso.sh'
-                archiveArtifacts artifacts: 'iso-build-scripts/output/sineware.iso', fingerprint: true
+                echo 'Building Sineware Adelie RootFS...'
+                sh 'make adelie_rootfs'
+                //archiveArtifacts artifacts: 'artifacts/adelie-sineware.tar.gz', fingerprint: true
+            }
+        }
+        stage('Build System RootFS') {
+            steps {
+                echo 'Building Sineware...'
+                sh 'make system_rootfs'
+                archiveArtifacts artifacts: 'artifacts/sineware.tar.gz', fingerprint: true
+            }
+        }
+        stage('Build Test HDD Image') {
+            steps {
+                echo 'Building Sineware Testing IMG...'
+                sh 'make sineware_img'
+                archiveArtifacts artifacts: 'artifacts/sineware-hdd.img', fingerprint: true
             }
         }
     }

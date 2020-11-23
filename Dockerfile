@@ -13,6 +13,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install  -y \
   util-linux \
   gdisk \
   e2fsprogs \
-  grub-common
+  grub-common grub-pc-bin xorriso\
+  rsync \
+  linux-generic-hwe-20.04
 
 CMD ["./build.sh"]
