@@ -10,6 +10,7 @@ class running_process {
 public:
     std::string name;
     std::string exec;
+    std::vector<char *> argv;
     int pid;
 };
 

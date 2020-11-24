@@ -54,7 +54,7 @@ LABEL linux
 EOT
 # todo why isn't UUID working???
 #echo "    APPEND root=UUID=$ROOT_GUID init=/init" >> /build/syslinux.cfg
-echo "    APPEND root=/dev/sda2 init=/init" >> /build/syslinux.cfg
+echo "    APPEND root=/dev/sda2 init=/init quiet" >> /build/syslinux.cfg
 cat /build/syslinux.cfg
 echo "UUID=$ROOT_GUID / ext2 defaults 0 1" > $ROOTFS/etc/fstab
 echo "UUID=$BOOT_GUID /boot vfat defaults 0 1" >> $ROOTFS/etc/fstab

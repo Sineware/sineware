@@ -42,14 +42,13 @@ static void spawn(running_process& proc) {
     char * exec = new char [proc.exec.length()+1];
     std::strcpy(exec, proc.exec.c_str());
 
-    char *const argv[]  = { exec, NULL }; // temp
     int pid = fork();
     switch (pid) {
         case 0:
             // Unblock the signals because the child handles it, not us
             sigprocmask(SIG_UNBLOCK, &set, NULL);
             setsid();
-            execvp(argv[0], argv); // spawn the child process!
+            execvp(exec, proc.argv.data()); // spawn the child process!
             perror("execvp");
             _exit(1);
         case -1:
@@ -82,7 +81,7 @@ int main() {
 
     std::stringstream ss(config_init);
 
-    while( ss.good() ) {
+    while(ss.good()) {
         std::string proc_name;
         std::getline( ss, proc_name, ',' );
         running_process proc;
@@ -91,6 +90,15 @@ int main() {
         std::string proc_exec;
         inipp::extract(ini.sections[proc_name]["exec"], proc_exec);
         proc.exec = proc_exec;
+
+        proc.argv.push_back(const_cast<char*>(proc_name.c_str()));  // argv[0] should be the executable
+        std::stringstream ss_argv(ini.sections[proc_name]["argv"]);
+        while(ss_argv.good()) {
+            std::string proc_argv_entry;
+            std::getline(ss_argv, proc_argv_entry, ',');
+            proc.argv.push_back(const_cast<char*>(proc_argv_entry.c_str()));
+        }
+        proc.argv.push_back(NULL);
 
         processes.push_back(proc);
     }
@@ -104,6 +112,8 @@ int main() {
     if(mount("/sys", "/root_a/sys/", NULL, MS_BIND | MS_REC, NULL) != 0) { fatal_error("Bind sys in chroot: " + std::to_string(errno)); }
 
     if(mount("/dev", "/root_a/dev/", NULL, MS_BIND | MS_REC, NULL) != 0) { fatal_error("Bind dev in chroot: " + std::to_string(errno)); }
+
+    if(mount("/", "/root_a/sineware/", NULL, MS_BIND | MS_REC, NULL) != 0) { fatal_error("Bind root in chroot: " + std::to_string(errno)); }
 
 //    system("cat /sineware-release");
 

@@ -51,6 +51,10 @@ mkdir -pv $ROOTFS/boot
 
 mkdir -pv $ROOTFS/dev mkdir -pv $ROOTFS/proc mkdir -pv $ROOTFS/sys
 
+
+# root stuff
+mkdir -pv $ROOTFS/root_a/sineware
+
 ls -l
 ls -l $ROOTFS
 
@@ -87,10 +91,14 @@ touch $ROOTFS/sineware.ini
 cat <<EOT >> $ROOTFS/sineware.ini
 [sineware]
 version=${SINEWARE_VERSION_ID}
-init=bash
+init=getty
 
-[bash]
-exec=/bin/bash
+[getty]
+exec=/sbin/agetty
+argv=-l,/bin/login,38400,tty2
+[openssh-server]
+exec=/usr/sbin/sshd
+argv=-D
 EOT
 #cp -rv /build-scripts/files/etc/* $ROOTFS/etc/
 
@@ -118,7 +126,7 @@ cd $ROOTFS/root_a
 cp /etc/resolv.conf etc/resolv.conf
 
 chroot $ROOTFS/root_a /sbin/apk update
-chroot $ROOTFS/root_a /sbin/apk add bash wget
+chroot $ROOTFS/root_a /sbin/apk add bash wget eudev netifrc openssh-server
 chroot $ROOTFS/root_a /bin/sh -c "cd /sbin && wget https://raw.githubusercontent.com/dylanaraps/neofetch/master/neofetch && chmod +x neofetch"
 popd
 echo "* Build Step: Kernel *"

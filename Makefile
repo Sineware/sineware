@@ -10,7 +10,7 @@ all: clean build_container adelie_rootfs system_rootfs sineware_img
 clean:
 	mkdir -p build-scripts/output
 	mkdir -p artifacts
-	mkdir -p iso-build-scripts/output/*
+	mkdir -p iso-build-scripts/output/
 	rm -rf artifacts/*
 	rm -rf build-scripts/output/*
 	rm -rf iso-build-scripts/output/*
