@@ -9,8 +9,14 @@
 class running_process {
 public:
     std::string name;
+
     std::string exec;
-    std::vector<char *> argv;
+    std::vector<std::string> argv;
+
+    std::string type;
+
+    int level;
+
     int pid;
 };
 

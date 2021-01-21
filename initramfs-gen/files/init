@@ -1,0 +1,44 @@
+#!/bin/busybox sh
+clear
+echo "* Sineware Is Starting Up (Basic Initramfs) *"
+mount -t proc none /proc
+mount -t sysfs none /sys
+
+echo "Loading device modules... (Coldplugging Devices)"
+find /sys/devices -name modalias -type f -print0 | xargs -0 sort -u | xargs /sbin/modprobe -ab
+
+sleep 3
+
+echo "Populating /dev/"
+echo /sbin/mdev > /proc/sys/kernel/hotplug
+mdev -s
+
+echo "Displaying bootsplash..."
+clear
+cat /splash.bgra > /dev/fb0
+
+cmdline() {
+    local value
+    value=" $(cat /proc/cmdline) "
+    value="${value##* ${1}=}"
+    value="${value%% *}"
+    [ "${value}" != "" ] && echo "${value}"
+}
+
+rescue_shell() {
+    echo "Something went wrong. Dropping to a shell."
+    exec sh
+}
+
+echo "Booting from device $(cmdline root)"
+mount $(cmdline root) /mnt/root || rescue_shell
+
+mount /mnt/root/squashfs.img /mnt/live || rescue_shell
+
+# unmount, switch_root
+umount /proc
+umount /sys
+umount /dev
+
+# Boot the real thing
+exec switch_root /mnt/live /sbin/init

@@ -15,6 +15,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install  -y \
   e2fsprogs \
   grub-common grub-pc-bin xorriso\
   rsync \
-  linux-generic-hwe-20.04
+  linux-generic-hwe-20.04 \
+  libkmod-dev pkg-config \
+  flex bison libelf-dev libssl-dev bc #kernel
 
 CMD ["./build.sh"]

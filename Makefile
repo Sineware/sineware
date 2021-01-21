@@ -1,19 +1,17 @@
 SINEWARE_DEVELOPMENT ?= false
 BUILD_CONTAINER ?= true
 
-all: clean build_container adelie_rootfs system_rootfs sineware_img
+all: clean build_container system_rootfs sineware_img
 	@echo "Sineware Build Complete!"
 	@date
 
 # make folders if they are not already there
 # clean out existing folders.
 clean:
-	mkdir -p build-scripts/output
 	mkdir -p artifacts
-	mkdir -p iso-build-scripts/output/
+	mkdir -p buildmeta
 	rm -rf artifacts/*
-	rm -rf build-scripts/output/*
-	rm -rf iso-build-scripts/output/*
+	rm -rf buildmeta/*
 
 build_container:
 ifeq ($(BUILD_CONTAINER),true)
@@ -23,32 +21,31 @@ else
 	@echo "Skipping building the Docker build container."
 endif
 
-adelie_rootfs:
-	@echo "Building the Adelie RootFS!"
-#ifeq ($(SINEWARE_DEVELOPMENT),true)
-#	@echo "Running the container interactivly (SINEWARE_DEVELOPMENT=true)"
-#	docker run -i -t -v "$(CURDIR)"/build-scripts:/build-scripts --rm --env SINEWARE_DEVELOPMENT=true sineware-build
-#	mv build-scripts/output/sineware.tar.gz artifacts/
-#else
-#	docker run -i -v "$(CURDIR)"/build-scripts:/build-scripts --rm sineware-build
-#	mv build-scripts/output/sineware.tar.gz artifacts/
-#endif
-
 system_rootfs:
 ifeq ($(SINEWARE_DEVELOPMENT),true)
 	@echo "Running the container interactivly (SINEWARE_DEVELOPMENT=true)"
-	docker run -i -t -v "$(CURDIR)"/build-scripts:/build-scripts --rm --env SINEWARE_DEVELOPMENT=true sineware-build
-	mv build-scripts/output/sineware.tar.gz artifacts/
+	docker run -i -t -v "$(CURDIR)"/build-scripts:/build-scripts -v "$(CURDIR)"/artifacts:/artifacts \
+	 -v /dev:/dev --privileged --rm --env SINEWARE_DEVELOPMENT=true sineware-build
 else
-	docker run -i -v "$(CURDIR)"/build-scripts:/build-scripts --rm sineware-build
-	mv build-scripts/output/sineware.tar.gz artifacts/
+	docker run -i -v "$(CURDIR)"/build-scripts:/build-scripts -v "$(CURDIR)"/artifacts:/artifacts \
+	 -v /dev:/dev --privileged --rm sineware-build
 endif
 
 sineware_img:
-	cp artifacts/sineware.tar.gz iso-build-scripts/files/
-	docker run -i -v "$(CURDIR)"/iso-build-scripts:/build-scripts --rm \
+	docker run -i -t -v "$(CURDIR)"/iso-build-scripts:/build-scripts --rm \
+	-v "$(CURDIR)"/artifacts:/artifacts \
 	-v /dev:/dev \
 	--privileged \
 	sineware-build
-	mv iso-build-scripts/output/sineware-hdd.img artifacts/
-	rm iso-build-scripts/files/sineware.tar.gz
+
+initramfs:
+	docker run -i -t \
+	-v "$(CURDIR)"/initramfs-gen:/build-scripts \
+	-v "$(CURDIR)"/artifacts:/artifacts \
+	-v /dev:/dev --privileged --rm --env SINEWARE_DEVELOPMENT=true sineware-build
+
+kernel:
+	docker run -i -t \
+	-v "$(CURDIR)"/kernel-gen:/build-scripts \
+	-v "$(CURDIR)"/artifacts:/artifacts \
+	-v /dev:/dev --privileged --rm --env SINEWARE_DEVELOPMENT=true sineware-build

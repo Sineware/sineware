@@ -1,0 +1,1 @@
+This directory is passed into each stage's build container to communicate its current status.
