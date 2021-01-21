@@ -17,6 +17,6 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install  -y \
   rsync \
   linux-generic-hwe-20.04 \
   libkmod-dev pkg-config \
-  flex bison libelf-dev libssl-dev bc #kernel
+  flex bison libelf-dev libssl-dev bc libncurses-dev #kernel
 
 CMD ["./build.sh"]

@@ -7,15 +7,14 @@ mount -t sysfs none /sys
 echo "Loading device modules... (Coldplugging Devices)"
 find /sys/devices -name modalias -type f -print0 | xargs -0 sort -u | xargs /sbin/modprobe -ab
 
-sleep 3
-
 echo "Populating /dev/"
-echo /sbin/mdev > /proc/sys/kernel/hotplug
-mdev -s
+mount -t devtmpfs none /dev
 
 echo "Displaying bootsplash..."
 clear
 cat /splash.bgra > /dev/fb0
+
+sleep 3 # enjoy that splash
 
 cmdline() {
     local value
@@ -33,12 +32,25 @@ rescue_shell() {
 echo "Booting from device $(cmdline root)"
 mount $(cmdline root) /mnt/root || rescue_shell
 
-mount /mnt/root/squashfs.img /mnt/live || rescue_shell
+mkdir /mnt/live/rom
+mkdir /mnt/live/overlay
+
+mount -t tmpfs tmpfs /mnt/live/overlay
+mkdir /mnt/live/overlay/fs
+mkdir /mnt/live/overlay/work
+
+mount /mnt/root/squashfs.img /mnt/live/rom || rescue_shell
+
+mount -t overlay overlay -o lowerdir=/mnt/live/rom,upperdir=/mnt/live/overlay/fs,workdir=/mnt/live/overlay/work /mnt/live
+
+# add an if cmdline to drop to shell
+#sh
 
 # unmount, switch_root
 umount /proc
 umount /sys
-umount /dev
+
+clear
 
 # Boot the real thing
-exec switch_root /mnt/live /sbin/init
+exec switch_root /mnt/live /sbin/init || rescue_shell
