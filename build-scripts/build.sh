@@ -49,24 +49,28 @@ echo "* Build Step: Adding files to rootfs *"
 cp -rv /build-scripts/files/etc/* $ROOTFS/etc/
 cp -rv /build-scripts/files/sineware.ini $ROOTFS/sineware.ini
 
-# Sineware Components
-/build-scripts/components/insert-name/build.sh
-
 echo "* Build Step: Adding Packages to the RootFS *"
 
 # Prepare for chroot
 mkdir -pv $ROOTFS/var/lock
 cp -v /etc/resolv.conf $ROOTFS/tmp/resolv.conf
 
+# Packages
 chroot $ROOTFS /bin/sh -c "opkg update"
 chroot $ROOTFS /bin/sh -c "opkg install python3"
 chroot $ROOTFS /bin/sh -c "opkg install bash"
 chroot $ROOTFS /bin/sh -c "opkg install htop"
 chroot $ROOTFS /bin/sh -c "opkg install busybox"
+chroot $ROOTFS /bin/sh -c "opkg install sfdisk"
+chroot $ROOTFS /bin/sh -c "opkg install lsblk"
 curl https://raw.githubusercontent.com/dylanaraps/neofetch/master/neofetch > $ROOTFS/usr/bin/neofetch
 chmod 755 $ROOTFS/usr/bin/neofetch
 
+# Sineware Components
+/build-scripts/components/insert-name/build.sh
+
 # Clean up
+chroot $ROOTFS /bin/sh -c "opkg --autoremove remove luci"
 rm -v $ROOTFS/tmp/resolv.conf
 
 echo "* Build Step: Creating rootfs archive *"

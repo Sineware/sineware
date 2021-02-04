@@ -1,7 +1,7 @@
 SINEWARE_DEVELOPMENT ?= false
 BUILD_CONTAINER ?= true
 
-all: clean build_container system_rootfs sineware_img
+all: clean build_container system_rootfs kernel initramfs sineware_img
 	@echo "Sineware Build Complete!"
 	@date
 
@@ -11,7 +11,6 @@ clean:
 	mkdir -p artifacts
 	mkdir -p buildmeta
 	rm -rf artifacts/*
-	rm -rf buildmeta/*
 
 build_container:
 ifeq ($(BUILD_CONTAINER),true)
@@ -49,3 +48,8 @@ kernel:
 	-v "$(CURDIR)"/kernel-gen:/build-scripts \
 	-v "$(CURDIR)"/artifacts:/artifacts \
 	-v /dev:/dev --privileged --rm --env SINEWARE_DEVELOPMENT=true sineware-build
+
+sineware_container:
+	cp ./artifacts/sineware.tar.gz ./os-variants/container/
+	cd ./os-variants/container; docker build . -t sineware
+	rm -rf ./os-variants/container/sineware.tar.gz

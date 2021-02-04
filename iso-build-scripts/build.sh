@@ -26,6 +26,8 @@ wget https://update.sineware.ca/dist/components/grub/sineware-grub-2.04-x86_64-p
 tar xvf sineware-grub-2.04-x86_64-pkg.tar.xz
 cp -rv sineware-grub-pkg/* $ROOTFS
 
+cp -v /build-scripts/files/sineware-installer/sineware-installer.py $ROOTFS/bin/sineware-installer
+
 cp -v /artifacts/bzImage $CDROOT/boot/bzImage
 
 
