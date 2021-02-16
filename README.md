@@ -1,24 +1,24 @@
-# Sineware Build System
-![Sineware Logo](https://sineware.ca/img/v6-logo-nobg.png)
+# Sineware Build System for ProLinux
+![Sineware Logo](https://update.sineware.ca/dist/prolinux-logo.png)
 
 > Warning: this documentation is pretty outdated at the moment!
 
 
 https://sineware.ca/ 
 
-This is the main repository of Sineware, the perfect host for containers and VMs!
+This is the main repository of Sineware ProLinux (formerly Sineware EL Server), the perfect host for containers and VMs!
 (and a potentially a mobile platform too)
 
-***SINEWARE IS UNDER HEAVY DEVELOPMENT! IT IS NOT READY TO USE YET.***
+***ProLinux IS UNDER HEAVY DEVELOPMENT! IT IS NOT READY TO USE YET.***
 
 ---
-### Building Sineware
-The `make all` command will create a fresh rootfs tar.gz file (in ./artifacts/sineware.tar.gz), and an HDD image (in ./artifacts/sineware-hdd.img).
+### Building Sineware ProLinux
+The `make all` command will create a fresh rootfs tar.gz file (in ./artifacts/sineware.tar.gz), and a live ISO (in ./artifacts/sineware.iso).
 You need Docker on your system to run it! (Build testing will come eventually)
 
 Both Linux and macOS (Docker Desktop) are officially supported as build hosts.
 
-**You may find it useful to inspect the `build-configuration.sh` file in the build-scripts folder.**
+See the docs/ directory for some documentation.
 
 ---
 ### Testing with QEMU

@@ -1,0 +1,17 @@
+{
+  "name": "sineware-setup-build",
+  "version": "1.0.0",
+  "description": "Scripts for setting up the Sineware Build environment",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Seshan Ravikumar",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "@iarna/toml": "^2.2.5",
+    "axios": "^0.21.1",
+    "chalk": "^4.1.0",
+    "log-symbols": "^4.0.0"
+  }
+}

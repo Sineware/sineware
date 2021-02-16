@@ -1,14 +1,7 @@
 #!/usr/bin/env bash
+# Local Build Configuration
+
 export SINEWARE_ARCH=$(uname -m)
-
-# Names
-export SINEWARE_NAME="Sineware"
-export SINEWARE_ID="sineware"
-export SINEWARE_VERSION="1.0 Dev Milestone 2"
-export SINEWARE_BUILD="1001"
-export SINEWARE_PRODUCT="EL Server"
-
-export SINEWARE_PRETTY_NAME="$SINEWARE_NAME $SINEWARE_VERSION ($SINEWARE_BUILD)"
 
 # Build Options
 if [ "$SINEWARE_DEVELOPMENT" = true ] # passed by the build-everything script.
@@ -18,7 +11,6 @@ then
 else
   export COMPILE_KERNEL=true
 fi
-export SINEWARE_UBUNTU_KERNEL_VERSION=5.4.0-53-generic
 
 export SINEWARE_SUPPORTED_ARCH=("x86_64" "aarch64")
 if [[ ! " ${SINEWARE_SUPPORTED_ARCH[@]} " =~ " ${SINEWARE_ARCH} " ]]; then

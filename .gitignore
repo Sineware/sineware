@@ -4,3 +4,6 @@ sineware.qcow2
 .DS_Store
 .idea
 artifacts
+buildmeta
+
+node_modules

@@ -12,6 +12,10 @@ clean:
 	mkdir -p buildmeta
 	rm -rf artifacts/*
 
+setup_build:
+	@echo "Running the build setup script..."
+	node ./tools/setup-build/index.js
+
 build_container:
 ifeq ($(BUILD_CONTAINER),true)
 	@echo "Building the Docker build container"
@@ -24,15 +28,18 @@ system_rootfs:
 ifeq ($(SINEWARE_DEVELOPMENT),true)
 	@echo "Running the container interactivly (SINEWARE_DEVELOPMENT=true)"
 	docker run -i -t -v "$(CURDIR)"/build-scripts:/build-scripts -v "$(CURDIR)"/artifacts:/artifacts \
-	 -v /dev:/dev --privileged --rm --env SINEWARE_DEVELOPMENT=true sineware-build
+	-v "$(CURDIR)"/buildmeta:/buildmeta \
+	-v /dev:/dev --privileged --rm --env SINEWARE_DEVELOPMENT=true sineware-build
 else
 	docker run -i -v "$(CURDIR)"/build-scripts:/build-scripts -v "$(CURDIR)"/artifacts:/artifacts \
-	 -v /dev:/dev --privileged --rm sineware-build
+	-v "$(CURDIR)"/buildmeta:/buildmeta \
+	-v /dev:/dev --privileged --rm sineware-build
 endif
 
 sineware_img:
 	docker run -i -t -v "$(CURDIR)"/iso-build-scripts:/build-scripts --rm \
 	-v "$(CURDIR)"/artifacts:/artifacts \
+	-v "$(CURDIR)"/buildmeta:/buildmeta \
 	-v /dev:/dev \
 	--privileged \
 	sineware-build
@@ -41,12 +48,14 @@ initramfs:
 	docker run -i -t \
 	-v "$(CURDIR)"/initramfs-gen:/build-scripts \
 	-v "$(CURDIR)"/artifacts:/artifacts \
+	-v "$(CURDIR)"/buildmeta:/buildmeta \
 	-v /dev:/dev --privileged --rm --env SINEWARE_DEVELOPMENT=true sineware-build
 
 kernel:
 	docker run -i -t \
 	-v "$(CURDIR)"/kernel-gen:/build-scripts \
 	-v "$(CURDIR)"/artifacts:/artifacts \
+	-v "$(CURDIR)"/buildmeta:/buildmeta \
 	-v /dev:/dev --privileged --rm --env SINEWARE_DEVELOPMENT=true sineware-build
 
 sineware_container:

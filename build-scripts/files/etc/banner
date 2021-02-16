@@ -6,7 +6,10 @@
  |_____/|_|_| |_|\___| \_/\_/ \__,_|_|  \___|
 
 
-SINEWARE_PRODUCT SINEWARE_VERSION SINEWARE_BUILD (Under Construction)
+SINEWARE_PRETTY_NAME
+SINEWARE_PRETTY_VERSION
+Channel: SINEWARE_CHANNEL
+(Under Construction)
 
 Copyright (C) 2020 Seshan Ravikumar
     This program comes with ABSOLUTELY NO WARRANTY.

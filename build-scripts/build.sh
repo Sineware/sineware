@@ -20,6 +20,10 @@ set -e # Crash when a command fails
 echo "* Starting $SINEWARE_PRETTY_NAME build on $(date) *"
 echo "Go get your noodles, this may take a while!"
 
+# Source the global build config
+source /buildmeta/buildconfig.sh
+
+# Source the local build config
 source /build-scripts/build-configuration.sh
 
 echo "* Build Step: Getting Ready *"

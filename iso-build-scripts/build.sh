@@ -3,6 +3,8 @@ set -e
 echo "Generating a Sineware ALPHA ISO on $(date)"
 echo "Go get your noodles!"
 
+# CDROOT is the ISO9660 filesystem,
+# ROOTFS is the SquashFS Linux root.
 export ROOTFS=/build/rootfs
 export CDROOT=/build/cdroot
 #export LIBGUESTFS_DEBUG=1 LIBGUESTFS_TRACE=1
