@@ -37,6 +37,9 @@ echo "* Creating SquashFS Image *"
 cd $CDROOT/
 mksquashfs $ROOTFS squashfs.img
 
+# Todo separate installer squashfs and system squashfs (different build step in os-variants)
+cp squashfs.img /artifacts/sineware.squashfs.img
+
 echo "* Build Step: Generating ISO file *"
 grub-mkrescue -o /artifacts/sineware.iso $CDROOT
 

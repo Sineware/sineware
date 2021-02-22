@@ -41,7 +41,10 @@ mkdir /mnt/live/overlay/work
 
 mount /mnt/root/squashfs.img /mnt/live/rom || rescue_shell
 
+# todo openwrt does something (failsafe mode)
 mount -t overlay overlay -o lowerdir=/mnt/live/rom,upperdir=/mnt/live/overlay/fs,workdir=/mnt/live/overlay/work /mnt/live
+mkdir /mnt/live/system
+mount $(cmdline root) /mnt/live/system
 
 # add an if cmdline to drop to shell
 #sh

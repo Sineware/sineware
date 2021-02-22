@@ -1,7 +1,7 @@
 SINEWARE_DEVELOPMENT ?= false
 BUILD_CONTAINER ?= true
 
-all: clean build_container system_rootfs kernel initramfs sineware_img
+all: clean deps build_container system_rootfs kernel initramfs sineware_img
 	@echo "Sineware Build Complete!"
 	@date
 
@@ -11,6 +11,11 @@ clean:
 	mkdir -p artifacts
 	mkdir -p buildmeta
 	rm -rf artifacts/*
+
+deps:
+	@echo "Installing dependencies..."
+	cd ./tools/setup-build; npm i
+	cd ./tools/update-deployer; npm i
 
 setup_build:
 	@echo "Running the build setup script..."
@@ -62,3 +67,7 @@ sineware_container:
 	cp ./artifacts/sineware.tar.gz ./os-variants/container/
 	cd ./os-variants/container; docker build . -t sineware
 	rm -rf ./os-variants/container/sineware.tar.gz
+
+deploy_update:
+	@echo "Running the update deployer script..."
+	node ./tools/update-deployer/index.js

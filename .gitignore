@@ -7,3 +7,4 @@ artifacts
 buildmeta
 
 node_modules
+.env

@@ -2,9 +2,8 @@ const axios = require('axios').default;
 const chalk = require('chalk');
 const fs = require("fs");
 const logSymbols = require('log-symbols');
-const TOML = require('@iarna/toml')
 
-function checkDirectoriesExist(arr) {
+function checkFSExists(arr) {
     for(let i of arr) {
         if (fs.existsSync("./" + i)) {
             console.log(logSymbols.success, "Integrity Check Passed: " + i);
@@ -41,7 +40,7 @@ async function main() {
     // todo actually do useful things here
     console.log(logSymbols.info, "Verifying file integrity...");
     let dirs = ["artifacts", "build-scripts", "buildmeta", "initramfs-gen", "iso-build-scripts", "kernel-gen", "os-variants", "tools"];
-    checkDirectoriesExist(dirs);
+    checkFSExists(dirs);
 
     // Determine the next build number
     console.log(logSymbols.info, "Contacting the update server for the latest build number...");
