@@ -1,0 +1,15 @@
+{
+  "name": "prolinux-update-client",
+  "version": "1.0.0",
+  "description": "ProLinux Client for Sineware Update",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "pkg index.js --targets node12-alpine-x64 && mv index ../../artifacts/prolinux-update-client"
+  },
+  "author": "Seshan Ravikumar",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "pkg": "^4.4.9"
+  }
+}
