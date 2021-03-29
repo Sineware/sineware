@@ -11,6 +11,8 @@ This is the main repository of Sineware ProLinux (formerly Sineware EL Server), 
 
 ***ProLinux IS UNDER HEAVY DEVELOPMENT! IT IS NOT READY TO USE YET.***
 
+Clone the repository using `git clone --recurse-submodules https://github.com/Sineware/sineware.git` to ensure submodules are cloned.
+
 ---
 ### Building Sineware ProLinux
 The `make all` command will build ProLinux from scratch and output artifacts to the 'artifacts' folder.
@@ -20,9 +22,10 @@ The `make all` command will build ProLinux from scratch and output artifacts to 
 Building from macOS is no longer supported. 
 
 GNU/Linux requirements:
-- The "build-essentials" (Ubuntu), "base-devel" (Arch), packages or similar. (GCC, Make, etc)
+- "build-essentials" (Ubuntu), "base-devel" (Arch), etc. [See here for a full list of compiler requirements.](https://buildroot.org/downloads/manual/manual.html#requirement)
 - Node.js + npm
 - Docker
+
 
 See the docs/ directory for some documentation.
 
