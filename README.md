@@ -13,10 +13,16 @@ This is the main repository of Sineware ProLinux (formerly Sineware EL Server), 
 
 ---
 ### Building Sineware ProLinux
-The `make all` command will create a fresh rootfs tar.gz file (in ./artifacts/sineware.tar.gz), and a live ISO (in ./artifacts/sineware.iso).
-You need Docker on your system to run it! (Build testing will come eventually)
+The `make all` command will build ProLinux from scratch and output artifacts to the 'artifacts' folder.
 
-Both Linux and macOS (Docker Desktop) are officially supported as build hosts.
+**Build Host Requirements**
+
+Building from macOS is no longer supported. 
+
+GNU/Linux requirements:
+- The "build-essentials" (Ubuntu), "base-devel" (Arch), packages or similar. (GCC, Make, etc)
+- Node.js + npm
+- Docker
 
 See the docs/ directory for some documentation.
 

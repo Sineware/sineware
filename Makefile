@@ -1,7 +1,7 @@
 SINEWARE_DEVELOPMENT ?= false
 BUILD_CONTAINER ?= true
 
-all: clean deps build_container system_rootfs kernel initramfs sineware_img
+all: clean deps setup_build build_container system_rootfs kernel initramfs sineware_img
 	@echo "Sineware Build Complete!"
 	@date
 
@@ -30,6 +30,7 @@ else
 endif
 
 system_rootfs:
+	test -s ./buildmeta/buildconfig.sh || { echo "Error: The buildmeta/buildconfig.sh file does not exist! Did the setup-build script run?"; exit 1; }
 ifeq ($(SINEWARE_DEVELOPMENT),true)
 	@echo "Running the container interactivly (SINEWARE_DEVELOPMENT=true)"
 	docker run -i -t -v "$(CURDIR)"/build-scripts:/build-scripts -v "$(CURDIR)"/artifacts:/artifacts \
