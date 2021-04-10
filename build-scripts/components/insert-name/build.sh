@@ -3,7 +3,7 @@ set -e
 echo "* Build Step: Inserting Sineware Names Using sed *"
 pushd .
 
-# See buildmeta/buildconfig.ini (generated)
+# See buildmeta/buildconfig.sh (generated)
 
 cd $ROOTFS
 

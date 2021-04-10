@@ -1,7 +1,11 @@
 SINEWARE_DEVELOPMENT ?= false
 BUILD_CONTAINER ?= true
 
-all: clean deps setup_build build_container system_rootfs kernel initramfs sineware_img
+all: clean deps setup_build build_container build_buildroot system_rootfs kernel initramfs sineware_img
+	@echo "Sineware Build Complete!"
+	@date
+# Todo: save sineware-buildroot.tar.gz before running clean
+all_no_buildroot: clean deps setup_build build_container system_rootfs kernel initramfs sineware_img
 	@echo "Sineware Build Complete!"
 	@date
 
@@ -29,8 +33,13 @@ else
 	@echo "Skipping building the Docker build container."
 endif
 
+build_buildroot:
+	@echo "Starting Buildroot..."
+	cd buildroot && ./build.sh
+
 system_rootfs:
 	test -s ./buildmeta/buildconfig.sh || { echo "Error: The buildmeta/buildconfig.sh file does not exist! Did the setup-build script run?"; exit 1; }
+	test -s ./buildmeta/buildconfig.sh || { echo "Error: The artifacts/sineware-buildroot.tar.gz file does not exist! Did make build_buildroot run?"; exit 1; }
 ifeq ($(SINEWARE_DEVELOPMENT),true)
 	@echo "Running the container interactivly (SINEWARE_DEVELOPMENT=true)"
 	docker run -i -t -v "$(CURDIR)"/build-scripts:/build-scripts -v "$(CURDIR)"/artifacts:/artifacts \
@@ -63,6 +72,7 @@ kernel:
 	-v "$(CURDIR)"/artifacts:/artifacts \
 	-v "$(CURDIR)"/buildmeta:/buildmeta \
 	-v /dev:/dev --privileged --rm --env SINEWARE_DEVELOPMENT=true sineware-build
+
 
 sineware_container:
 	cp ./artifacts/sineware.tar.gz ./os-variants/container/
