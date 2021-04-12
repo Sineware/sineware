@@ -81,4 +81,4 @@ sineware_container:
 
 deploy_update:
 	@echo "Running the update deployer script..."
-	node ./tools/update-deployer/index.js
+	source ./buildmeta/buildconfig.sh && node ./tools/update-deployer/index.js

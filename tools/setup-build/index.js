@@ -47,7 +47,7 @@ async function main() {
     let updatesReq;
     let buildNum;
     try {
-        updatesReq = await axios.get("https://update.sineware.ca/wp-json/wp/v2/update");
+        updatesReq = await axios.get("https://update.sineware.ca/api/v1/update/all");
         //console.log(updatesReq.data[0]);
         buildNum = parseInt(updatesReq.data[0].build);
     } catch (e) {
@@ -62,7 +62,8 @@ async function main() {
     let buildConfig = {};
     // Machine readable (sineware.ini)
     buildConfig.SINEWARE_BUILD = buildNum;
-    buildConfig.SINEWARE_PRODUCT = "prolinux-server"
+    buildConfig.SINEWARE_PRODUCT = "prolinux"
+    buildConfig.SINEWARE_VARIANT = "server"
     buildConfig.SINEWARE_CHANNEL = "devel"
     // Pretty Names
     buildConfig.SINEWARE_PRETTY_NAME="Sineware ProLinux Server"
